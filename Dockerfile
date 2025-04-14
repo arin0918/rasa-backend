@@ -10,15 +10,18 @@ RUN apt-get update && apt-get install -y \
     git \
     && apt-get clean
 
-# Check Python version
+# Check Python version (for logs)
 RUN python --version
 
 # Copy requirements and install
 COPY requirements.txt ./
 RUN pip install --upgrade pip && pip install -r requirements.txt
 
-# Install spaCy separately and download model
-RUN pip install spacy==3.5.3 && python -m spacy download en_core_web_md
+# Install spaCy separately
+RUN pip install spacy==3.5.3
+
+# Download the spaCy model
+RUN python -m spacy download en_core_web_md
 
 # Copy project files
 COPY . .
