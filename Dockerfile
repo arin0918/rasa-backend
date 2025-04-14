@@ -18,27 +18,23 @@ RUN apt-get update && apt-get install -y \
     libblas-dev \
     liblapack-dev \
     gfortran \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Check Python version
 RUN python --version
 
-# Copy requirements and install dependencies
+# Copy requirements and install Python packages
 COPY requirements.txt ./
 RUN pip install --upgrade pip && pip install -r requirements.txt
 
-# Install spaCy separately
-RUN pip install spacy==3.5.3
-
-# Download spaCy model
-RUN python -m spacy download en_core_web_md
+# Install spaCy model via pip (lighter and avoids CLI install issues)
+RUN pip install https://github.com/explosion/spacy-models/releases/download/en_core_web_md-3.5.0/en_core_web_md-3.5.0-py3-none-any.whl
 
 # Copy project files
 COPY . .
 
-# Expose Rasa port
+# Expose port for Rasa
 EXPOSE 8000
 
-# Start Rasa server
+# Run Rasa server
 CMD ["rasa", "run", "--enable-api", "--cors", "*", "--port", "8000", "--debug"]
