@@ -1,5 +1,5 @@
-# Base image
-FROM python:3.8
+# Base image (slim)
+FROM python:3.8-slim
 
 # Set working directory
 WORKDIR /app
@@ -18,7 +18,8 @@ RUN apt-get update && apt-get install -y \
     libblas-dev \
     liblapack-dev \
     gfortran \
-    && apt-get clean
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 # Check Python version
 RUN python --version
@@ -30,8 +31,8 @@ RUN pip install --upgrade pip && pip install -r requirements.txt
 # Install spaCy separately
 RUN pip install spacy==3.5.3
 
-# Download spaCy model with workaround
-RUN python -m spacy download en_core_web_md || true
+# Download spaCy model
+RUN python -m spacy download en_core_web_md
 
 # Copy project files
 COPY . .
@@ -39,5 +40,5 @@ COPY . .
 # Expose Rasa port
 EXPOSE 8000
 
-# Default command to run the Rasa server
+# Start Rasa server
 CMD ["rasa", "run", "--enable-api", "--cors", "*", "--port", "8000", "--debug"]
