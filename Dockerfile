@@ -1,21 +1,23 @@
-# Use a base image with Python preinstalled
 FROM python:3.8-slim
 
-# Set working directory
 WORKDIR /app
 
-# Copy requirements file
+# Install required system packages for spaCy & Rasa
+RUN apt-get update && apt-get install -y gcc libffi-dev libssl-dev && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements and install them
 COPY requirements.txt .
 
-# Install dependencies
+# Use correct pip and install packages with pydantic fix
 RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt
+    pip install --no-cache-dir rasa==3.5.17 rasa-sdk==3.5.1 spacy==3.5.3 pydantic==1.10.0
 
-# Copy the rest of the application
+# Copy all source files
 COPY . .
 
-# Expose port for the web service
 EXPOSE 8000
 
-# Set the command to run Rasa with the correct model file
-CMD ["rasa", "run", "--enable-api", "--cors", "*", "--port", "8000", "--debug", "--model", "models/20250413-234312-tame-survey.tar.gz"]
+# Run spaCy model download at runtime (not build time to reduce image size)
+CMD python -m spacy download en_core_web_md && \
+    rasa run --enable-api --cors "*" --port 8000 --model models/20250413-234312-tame-survey.tar.gz
