@@ -10,6 +10,9 @@ RUN apt-get update && apt-get install -y \
     git \
     && apt-get clean
 
+# Check Python version
+RUN python --version
+
 # Copy requirements and install
 COPY requirements.txt ./
 RUN pip install --upgrade pip && pip install -r requirements.txt
