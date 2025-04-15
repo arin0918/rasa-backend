@@ -1,12 +1,12 @@
 language: "en"
 
 pipeline:
-- name: "SpacyNLP"
-  model: "en_core_web_sm"  # ✅ Switched to smaller model
-- name: "SpacyTokenizer"
-- name: "SpacyFeaturizer"
-- name: "DIETClassifier"
-  epochs: 100
+  - name: SpacyNLP
+    model: "en_core_web_sm"  # ✅ Using the smaller SpaCy model
+  - name: SpacyTokenizer
+  - name: SpacyFeaturizer
+  - name: DIETClassifier
+    epochs: 100
 
 assistant_id: 20250128-211148-caramel-charge
 
