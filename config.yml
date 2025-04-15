@@ -1,8 +1,8 @@
-language: "en"  # Default language
+language: "en"
 
 pipeline:
 - name: "SpacyNLP"
-  model: "en_core_web_md"  # Default English model
+  model: "en_core_web_sm"  # ✅ Switched to smaller model
 - name: "SpacyTokenizer"
 - name: "SpacyFeaturizer"
 - name: "DIETClassifier"
@@ -20,4 +20,3 @@ policies:
     max_history: 5
     epochs: 100
     constrain_similarities: true
-
