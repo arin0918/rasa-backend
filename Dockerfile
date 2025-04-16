@@ -1,24 +1,24 @@
+# Base image
 FROM python:3.8-slim
 
-USER root
-
-RUN apt-get update && \
-    apt-get install -y \
-    git \
-    build-essential \
-    libhdf5-dev \
-    libhdf5-serial-dev && \
-    rm -rf /var/lib/apt/lists/*
-
+# Set working directory
 WORKDIR /app
 
-RUN git clone https://github.com/arin0918/rasa-backend.git .
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    git \
+    && apt-get clean
 
-RUN pip install --upgrade pip && \
-    pip install -r requirements.txt
+# Copy requirements and install dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir --upgrade pip && pip install --no-cache-dir -r requirements.txt
 
-RUN python -m spacy download en_core_web_md
+# Copy entire project files
+COPY . .
 
-EXPOSE 5005
+# Expose Rasa default port
+EXPOSE 8000
 
-CMD ["rasa", "run", "--enable-api", "--cors", "*", "--debug"]
+# Run Rasa server with specified model (update the model filename if different)
+CMD ["rasa", "run", "--enable-api", "--cors", "*", "--port", "8000", "--debug", "--model", "models/20250320-050304-tough-limit.tar.gz"]
