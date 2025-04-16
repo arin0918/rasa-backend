@@ -1,22 +1,27 @@
-FROM python:3.10-slim
+FROM python:3.8-slim
 
 WORKDIR /app
+
+# Install dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    gcc \
+    git \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements
 COPY requirements.txt .
 
-# Install dependencies
-RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt
+# Install Python packages (with pydantic 1.10.0 for Rasa compatibility)
+RUN pip install --no-cache-dir --upgrade pip \
+    && pip install --no-cache-dir -r requirements.txt
 
-# ✅ Make sure spaCy medium model is downloaded
-RUN python -m spacy download en_core_web_md && python -m spacy validate
-
-# Copy the entire app
+# Copy all files
 COPY . .
 
-# Expose port
+# Expose Rasa default port
 EXPOSE 8000
 
-# ✅ Prevent memory crash (sets memory limit in container)
-CMD ["bash", "-c", "ulimit -v 2097152 && rasa run --enable-api --port 8000 --cors '*'"]
+# Start Rasa server
+CMD ["rasa", "run", "--enable-api", "--cors", "*", "--debug", "--port", "8000"]
