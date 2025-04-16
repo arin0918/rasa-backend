@@ -1,27 +1,22 @@
-docker file-FROM python:3.8-slim
+language: "en"  # Default language
 
-WORKDIR /app
+pipeline:
+- name: "SpacyNLP"
+  model: "en_core_web_md"  # Default English model
+- name: "SpacyTokenizer"
+- name: "SpacyFeaturizer"
+- name: "DIETClassifier"
+  epochs: 100
 
-# Install dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    gcc \
-    git \
-    curl \
-    && rm -rf /var/lib/apt/lists/*
+assistant_id: 20250128-211148-caramel-charge
 
-# Copy requirements
-COPY requirements.txt .
-
-# Install Python packages (with pydantic 1.10.0 for Rasa compatibility)
-RUN pip install --no-cache-dir --upgrade pip \
-    && pip install --no-cache-dir -r requirements.txt
-
-# Copy all files
-COPY . .
-
-# Expose Rasa default port
-EXPOSE 8000
-
-# Start Rasa server
-CMD ["rasa", "run", "--enable-api", "--cors", "*", "--debug", "--port", "8000"]
+policies:
+  - name: MemoizationPolicy
+  - name: RulePolicy
+  - name: UnexpecTEDIntentPolicy
+    max_history: 5
+    epochs: 100
+  - name: TEDPolicy
+    max_history: 5
+    epochs: 100
+    constrain_similarities: true
