@@ -1,28 +1,24 @@
-# Use smaller base image with Python 3.8
 FROM python:3.8-slim
 
-# Set working directory
+USER root
+
+RUN apt-get update && \
+    apt-get install -y \
+    git \
+    build-essential \
+    libhdf5-dev \
+    libhdf5-serial-dev && \
+    rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    git \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+RUN git clone https://github.com/arin0918/rasa-backend.git .
 
-# Copy requirements and install Python dependencies
-COPY requirements.txt ./
-RUN pip install --no-cache-dir --upgrade pip && pip install --no-cache-dir -r requirements.txt
+RUN pip install --upgrade pip && \
+    pip install -r requirements.txt
 
-# Do NOT install spaCy model here — it’s heavy and causes Koyeb image size to exceed 2GB
-# We'll download it at runtime if needed
+RUN python -m spacy download en_core_web_md
 
-# Copy project files
-COPY . .
+EXPOSE 5005
 
-# Expose Rasa port
-EXPOSE 8000
-
-# Default command to run the Rasa server
-CMD ["rasa", "run", "--enable-api", "--cors", "*", "--port", "8000", "--debug"]
+CMD ["rasa", "run", "--enable-api", "--cors", "*", "--debug"]
