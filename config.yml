@@ -1,12 +1,13 @@
 language: "en"
 
 pipeline:
-  - name: SpacyNLP
-    model: "en_core_web_sm"  # ✅ Using the smaller SpaCy model
-  - name: SpacyTokenizer
-  - name: SpacyFeaturizer
-  - name: DIETClassifier
-    epochs: 100
+  - name: "SpacyNLP"
+    model: "en_core_web_md"
+  - name: "SpacyTokenizer"
+  - name: "SpacyFeaturizer"
+  - name: "DIETClassifier"
+    epochs: 50  # ✅ reduced to lower memory
+  - name: "EntitySynonymMapper"
 
 assistant_id: 20250128-211148-caramel-charge
 
@@ -15,8 +16,8 @@ policies:
   - name: RulePolicy
   - name: UnexpecTEDIntentPolicy
     max_history: 5
-    epochs: 100
+    epochs: 50  # ✅ reduced
   - name: TEDPolicy
     max_history: 5
-    epochs: 100
+    epochs: 50
     constrain_similarities: true
