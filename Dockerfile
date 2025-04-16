@@ -7,8 +7,8 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
-# ✅ Download the small SpaCy model (low memory)
-RUN python -m spacy download en_core_web_sm
+# ✅ THIS is what solves your issue
+RUN python -m spacy download en_core_web_md
 
 COPY . .
 
